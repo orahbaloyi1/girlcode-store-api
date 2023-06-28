@@ -1,7 +1,62 @@
-from flask import Flask
+from flask import Flask, send_file
+from  flask_cors import CORS
 
-app = Flask(__name__)   #initiliaze flask application, name mean the module
+import config
 
-@app.route('/')         # call route, decorator.
+from db import db 
+
+app = Flask(__name__)   
+CORS(app)
+
+@app.route('/')         
 def main():
-    return"Girlcode store API"
+    return "Girlcode store API"
+
+@app.route('/categories') 
+
+
+def categories_route():
+    tmp_categories = []
+
+    cat_instance = db('categories')
+
+    rows = cat_instance.select()
+    
+    for row in rows:
+        print(row)
+        tmp_cat = {
+            "id" : row[0],
+            "name" : row[1],
+            "slug" : row[2],
+            "desc" : row[3],
+            "img" : row[4]
+
+        }
+        tmp_categories.append(tmp_cat)
+
+
+    categories_dict = {
+        "categories": tmp_categories
+    }
+
+    return categories_dict
+
+
+@app.route('/image/<img_name>')
+def get_image(img_name):
+    filename = f'images/{img_name}'
+
+    return send_file(filename, mimetype='image/jpg')
+
+
+    '''for row in rows:
+        tmp_cat = {
+            "id":row[0],
+            "name":row[1],
+            "slug":row[2],
+            "desc":row[0],
+            "img":row[0],
+            
+        }
+'''
+
